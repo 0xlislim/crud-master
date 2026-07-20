@@ -1,0 +1,8 @@
+# High-level service config (optional, expand as needed)
+services:
+  inventory:
+    port: 8080
+  billing:
+    queue: billing_queue
+  gateway:
+    port: 9000

@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: CRUD Master API Gateway
+  version: 0.1.0
+  description: Gateway routing to Inventory (HTTP) and Billing (RabbitMQ)
+paths:
+  /api/movies:
+    get:
+      summary: List movies (proxy to Inventory API)
+      responses:
+        '200':
+          description: List of movies
+    post:
+      summary: Create a movie (proxy to Inventory API)
+      responses:
+        '201':
+          description: Movie created
+    delete:
+      summary: Delete all movies (proxy to Inventory API)
+      responses:
+        '200':
+          description: All movies deleted
+  /api/movies/{id}:
+    get:
+      summary: Get movie by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movie found
+    put:
+      summary: Update movie by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movie updated
+    delete:
+      summary: Delete movie by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movie deleted
+  /api/billing:
+    post:
+      summary: Publish a billing message to billing_queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                number_of_items:
+                  type: string
+                total_amount:
+                  type: string
+      responses:
+        '200':
+          description: Message posted

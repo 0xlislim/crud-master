@@ -4,3 +4,5 @@ __pycache__/
 .vagrant/
 *.log
 .DS_Store
+study_guide.md
+subject.md

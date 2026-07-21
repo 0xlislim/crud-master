@@ -1,6 +1,16 @@
-"""Entrypoint: python server.py
+"""
 TODO: load .env, create app via app factory, run on GATEWAY_HOST:GATEWAY_PORT
 """
 
+
+"""Entrypoint: python server.py"""
+
+import os
+from app import create_app
+
+app = create_app()
+
 if __name__ == "__main__":
-    print("API Gateway placeholder - implement app startup here")
+    host = os.getenv("GATEWAY_HOST", "0.0.0.0")
+    port = int(os.getenv("GATEWAY_PORT", "9000"))
+    app.run(host=host, port=port, debug=True)

@@ -1,6 +1,8 @@
 """Entrypoint: python server.py
-TODO: load .env, start RabbitMQ consumer loop (blocking)
+Loads .env, starts RabbitMQ consumer loop.
 """
+from app.consumer import start_consumer
 
 if __name__ == "__main__":
-    print("Billing API placeholder - implement consumer startup here")
+    print("Starting Billing API (RabbitMQ Consumer)...")
+    start_consumer()

@@ -1,62 +1,70 @@
 openapi: 3.0.0
 info:
-  title: CRUD Master API Gateway
-  version: 0.1.0
-  description: Gateway routing to Inventory (HTTP) and Billing (RabbitMQ)
+  title: CRUD Master - API Gateway
+  version: 1.0.0
+  description: >
+    Single entry point for the CRUD Master movie streaming platform.
+    Routes /api/movies requests to the Inventory API over HTTP, and
+    publishes /api/billing requests to RabbitMQ's billing_queue for
+    asynchronous processing by the Billing API.
+
+servers:
+  - url: http://localhost:9000
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Service health check
+  - name: Movies
+    description: Proxied endpoints to the Inventory API
+  - name: Billing
+    description: Publishes billing requests to RabbitMQ for async processing
+
 paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Confirms the API Gateway process is up and responding.
+      responses:
+        '200':
+          description: Gateway is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: api-gateway
+
   /api/movies:
     get:
-      summary: List movies (proxy to Inventory API)
+      tags: [Movies]
+      summary: List all movies
+      description: >
+        Forwarded verbatim to the Inventory API. Supports an optional
+        `title` query parameter to filter movies whose title contains
+        the given value.
+      parameters:
+        - name: title
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter movies by (partial) title match
       responses:
         '200':
-          description: List of movies
+          description: List of movies returned by the Inventory API
+        '502':
+          description: Inventory API is unreachable
     post:
-      summary: Create a movie (proxy to Inventory API)
-      responses:
-        '201':
-          description: Movie created
-    delete:
-      summary: Delete all movies (proxy to Inventory API)
-      responses:
-        '200':
-          description: All movies deleted
-  /api/movies/{id}:
-    get:
-      summary: Get movie by id
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Movie found
-    put:
-      summary: Update movie by id
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Movie updated
-    delete:
-      summary: Delete movie by id
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Movie deleted
-  /api/billing:
-    post:
-      summary: Publish a billing message to billing_queue
+      tags: [Movies]
+      summary: Create a new movie
+      description: Forwarded verbatim to the Inventory API.
       requestBody:
         required: true
         content:
@@ -64,12 +72,120 @@ paths:
             schema:
               type: object
               properties:
-                user_id:
+                title:
                   type: string
-                number_of_items:
+                description:
                   type: string
-                total_amount:
+              example:
+                title: Dune
+                description: Sci-fi epic
+      responses:
+        '201':
+          description: Movie created
+        '502':
+          description: Inventory API is unreachable
+    delete:
+      tags: [Movies]
+      summary: Delete all movies
+      description: Forwarded verbatim to the Inventory API. Deletes every movie in the database.
+      responses:
+        '200':
+          description: All movies deleted
+        '502':
+          description: Inventory API is unreachable
+
+  /api/movies/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Movie identifier
+    get:
+      tags: [Movies]
+      summary: Get a single movie by id
+      description: Forwarded verbatim to the Inventory API.
+      responses:
+        '200':
+          description: Movie found
+        '404':
+          description: Movie not found
+        '502':
+          description: Inventory API is unreachable
+    put:
+      tags: [Movies]
+      summary: Update a single movie by id
+      description: Forwarded verbatim to the Inventory API.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
                   type: string
       responses:
         '200':
-          description: Message posted
+          description: Movie updated
+        '404':
+          description: Movie not found
+        '502':
+          description: Inventory API is unreachable
+    delete:
+      tags: [Movies]
+      summary: Delete a single movie by id
+      description: Forwarded verbatim to the Inventory API.
+      responses:
+        '200':
+          description: Movie deleted
+        '404':
+          description: Movie not found
+        '502':
+          description: Inventory API is unreachable
+
+  /api/billing:
+    post:
+      tags: [Billing]
+      summary: Submit a billing order for async processing
+      description: >
+        Publishes the request body as a JSON message to the RabbitMQ
+        `billing_queue`. Succeeds as long as the RabbitMQ broker is
+        reachable, even if the Billing API consumer is not currently
+        running -- queued messages are processed once the consumer
+        starts (or restarts).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, number_of_items, total_amount]
+              properties:
+                user_id:
+                  type: string
+                  example: "3"
+                number_of_items:
+                  type: string
+                  example: "5"
+                total_amount:
+                  type: string
+                  example: "180"
+      responses:
+        '200':
+          description: Message successfully published to billing_queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Message posted
+        '400':
+          description: Request body is missing or not valid JSON
+        '502':
+          description: RabbitMQ broker is unreachable

@@ -1,9 +1,3 @@
-"""TODO:
-- Flask app factory
-- register routes for /api/movies (proxy) and /api/billing (publish)
-"""
-
-
 """API Gateway app package."""
 
 import os

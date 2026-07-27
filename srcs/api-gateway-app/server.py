@@ -1,8 +1,3 @@
-"""
-TODO: load .env, create app via app factory, run on GATEWAY_HOST:GATEWAY_PORT
-"""
-
-
 """Entrypoint: python server.py"""
 
 import os

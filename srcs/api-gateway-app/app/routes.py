@@ -1,16 +1,8 @@
-"""TODO implement:
-- ANY /api/movies* -> forward request (method, body, query params) to
-  INVENTORY_API_URL:INVENTORY_API_PORT/api/movies*, return response verbatim
-- POST /api/billing -> publish request body as JSON message to billing_queue
-  (must succeed even if Billing API consumer is not running, since RabbitMQ
-  just needs the queue/broker up, not the consumer)
-"""
-
-
 """Routes for API Gateway."""
 
 import requests
 from flask import Blueprint, jsonify, request, current_app, Response
+from app.publisher import publish_billing_message
 
 bp = Blueprint("routes", __name__)
 
@@ -47,5 +39,26 @@ def proxy_movies(movie_id=None):
     return Response(resp.content, status=resp.status_code, content_type=resp.headers.get("Content-Type"))
 
 
-# TODO (Task 12): POST /api/billing -> publish request body as JSON message to
-#   billing_queue via app/publisher.py (must succeed even if Billing API is down)
+@bp.route("/api/billing", methods=["POST"])
+def publish_billing():
+    """Receive a billing request and publish it to billing_queue.
+    Must succeed even if the Billing API consumer is not running --
+    only the RabbitMQ broker needs to be up."""
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({"error": "Request body must be valid JSON"}), 400
+
+    config = {
+        "RABBITMQ_HOST": current_app.config["RABBITMQ_HOST"],
+        "RABBITMQ_PORT": current_app.config["RABBITMQ_PORT"],
+        "RABBITMQ_USER": current_app.config["RABBITMQ_USER"],
+        "RABBITMQ_PASSWORD": current_app.config["RABBITMQ_PASSWORD"],
+        "RABBITMQ_QUEUE": current_app.config["RABBITMQ_QUEUE"],
+    }
+
+    try:
+        publish_billing_message(body, config)
+    except Exception as exc:
+        return jsonify({"error": f"Could not publish message: {exc}"}), 502
+
+    return jsonify({"message": "Message posted"}), 200

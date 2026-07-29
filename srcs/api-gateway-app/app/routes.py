@@ -1,5 +1,3 @@
-"""Routes for API Gateway."""
-
 import requests
 from flask import Blueprint, jsonify, request, current_app, Response
 from app.publisher import publish_billing_message
@@ -35,7 +33,6 @@ def proxy_movies(movie_id=None):
     except requests.exceptions.ConnectionError:
         return jsonify({"error": "Inventory API is unreachable"}), 502
 
-    # Return the Inventory API's response as-is (status + body + content type)
     return Response(resp.content, status=resp.status_code, content_type=resp.headers.get("Content-Type"))
 
 

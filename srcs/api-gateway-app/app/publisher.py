@@ -1,5 +1,3 @@
-"""RabbitMQ publisher helper for API Gateway."""
-
 import json
 import pika
 

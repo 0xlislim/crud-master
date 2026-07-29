@@ -1,5 +1,3 @@
-"""API Gateway app package."""
-
 import os
 from flask import Flask
 from dotenv import load_dotenv
@@ -11,7 +9,6 @@ def create_app():
     """Application factory for the API Gateway."""
     app = Flask(__name__)
 
-    # Config pulled from environment variables (set via .env / Vagrant)
     app.config["INVENTORY_API_HOST"] = os.getenv("INVENTORY_API_HOST", "localhost")
     app.config["INVENTORY_API_PORT"] = os.getenv("INVENTORY_API_PORT", "8080")
     app.config["RABBITMQ_HOST"] = os.getenv("RABBITMQ_HOST", "localhost")

@@ -24,7 +24,7 @@ class Order(Base):
 
 def get_engine():
     db_user = os.getenv("BILLING_DB_USER", "billing_user")
-    db_password = os.getenv("BILLING_DB_PASSWORD", "changeme")
+    db_password = os.getenv("BILLING_DB_PASSWORD", "12qw!@QW")
     db_host = os.getenv("BILLING_DB_HOST", "localhost")
     db_port = os.getenv("BILLING_DB_PORT", "5432")
     db_name = os.getenv("BILLING_DB_NAME", "billing_db")

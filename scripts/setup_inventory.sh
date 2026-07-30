@@ -14,6 +14,9 @@ if ! command -v node >/dev/null 2>&1; then
 fi
 sudo npm install -g pm2
 
+sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname = '${INVENTORY_DB_USER:-inventory_user}'" | grep -q 1 || \
+  sudo -u postgres psql -c "CREATE USER ${INVENTORY_DB_USER:-inventory_user} WITH PASSWORD '${INVENTORY_DB_PASSWORD:-12qw!@QW}';"
+
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '${INVENTORY_DB_NAME:-movies_db}'" | grep -q 1 || \
   sudo -u postgres psql -c "CREATE DATABASE ${INVENTORY_DB_NAME:-movies_db} OWNER ${INVENTORY_DB_USER:-inventory_user};"
 

@@ -12,7 +12,7 @@ def create_app():
     
     # Database Configuration
     db_user = os.getenv("INVENTORY_DB_USER", "inventory_user")
-    db_password = os.getenv("INVENTORY_DB_PASSWORD", "changeme")
+    db_password = os.getenv("INVENTORY_DB_PASSWORD", "12qw!@QW")
     db_host = os.getenv("INVENTORY_DB_HOST", "localhost")
     db_port = os.getenv("INVENTORY_DB_PORT", "5432")
     db_name = os.getenv("INVENTORY_DB_NAME", "movies_db")

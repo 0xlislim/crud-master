@@ -1,6 +1,7 @@
 """RabbitMQ consumer for Billing API."""
 import os
 import json
+import signal
 import time
 import pika
 from dotenv import load_dotenv
@@ -108,6 +109,13 @@ def start_consumer():
     channel.basic_consume(queue=queue, on_message_callback=callback)
     
     print(f"Waiting for messages in '{queue}'... Press CTRL+C to exit.")
+
+    def shutdown(signum, frame):
+        print("Received shutdown signal, stopping consumer...")
+        channel.stop_consuming()
+
+    signal.signal(signal.SIGTERM, shutdown)
+
     try:
         channel.start_consuming()
     except KeyboardInterrupt:

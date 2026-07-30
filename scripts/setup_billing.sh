@@ -25,20 +25,11 @@ if [ "${RABBITMQ_USER:-guest}" != "guest" ]; then
   sudo rabbitmqctl set_permissions -p / "${RABBITMQ_USER}" ".*" ".*" ".*"
 fi
 
-# --- PostgreSQL: create billing_db + user + orders table (idempotent) ---
-sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname = '${BILLING_DB_USER:-billing_user}'" | grep -q 1 || \
-  sudo -u postgres psql -c "CREATE USER ${BILLING_DB_USER:-billing_user} WITH PASSWORD '${BILLING_DB_PASSWORD:-changeme}';"
-
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '${BILLING_DB_NAME:-billing_db}'" | grep -q 1 || \
   sudo -u postgres psql -c "CREATE DATABASE ${BILLING_DB_NAME:-billing_db} OWNER ${BILLING_DB_USER:-billing_user};"
 
-sudo -u postgres psql -d "${BILLING_DB_NAME:-billing_db}" -c "
-CREATE TABLE IF NOT EXISTS orders (
-  id SERIAL PRIMARY KEY,
-  user_id VARCHAR(255) NOT NULL,
-  number_of_items INTEGER NOT NULL,
-  total_amount NUMERIC NOT NULL
-);"
+# --- Create orders table (idempotent, safe to re-run) ---
+sudo -u postgres psql -d "${BILLING_DB_NAME:-billing_db}" -f /vagrant/scripts/init_billing_db.sql
 
 # --- App setup ---
 APP_DIR="/vagrant/srcs/billing-app"

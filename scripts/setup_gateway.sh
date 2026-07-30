@@ -25,4 +25,7 @@ sudo pm2 delete api-gateway-app 2>/dev/null || true
 sudo pm2 start "$APP_DIR/venv/bin/python" --name api-gateway-app -- "$APP_DIR/server.py"
 sudo pm2 save
 
+# --- Ensure PM2 resurrects this process list automatically on VM reboot ---
+sudo pm2 startup systemd -u root --hp /root | tail -1 | bash || true
+
 echo "=== gateway-vm provisioning complete ==="

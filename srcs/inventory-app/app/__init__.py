@@ -1,5 +1,6 @@
 """Inventory API app factory."""
 import os
+from urllib.parse import quote_plus
 from flask import Flask
 from dotenv import load_dotenv
 from app.models import db
@@ -10,14 +11,14 @@ def create_app():
     
     app = Flask(__name__)
     
-    # Database Configuration
-    db_user = os.getenv("INVENTORY_DB_USER", "inventory_user")
-    db_password = os.getenv("INVENTORY_DB_PASSWORD", "12qw!@QW")
+    # Database Configuration (credentials come from .env only -- never hard-code)
+    db_user = os.getenv("INVENTORY_DB_USER", "")
+    db_password = os.getenv("INVENTORY_DB_PASSWORD", "")
     db_host = os.getenv("INVENTORY_DB_HOST", "localhost")
     db_port = os.getenv("INVENTORY_DB_PORT", "5432")
     db_name = os.getenv("INVENTORY_DB_NAME", "movies_db")
     
-    db_uri = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    db_uri = f"postgresql://{quote_plus(db_user)}:{quote_plus(db_password)}@{db_host}:{db_port}/{db_name}"
     
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

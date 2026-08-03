@@ -6,28 +6,28 @@
 
 | # | Task | Owner | Priority | Est. | Status |
 |---|------|-------|----------|------|--------|
-| 1 | Set up repo structure, `.gitignore`, `.env` skeleton | Both | High | 1h | To Do |
-| 2 | Inventory API: Flask + SQLAlchemy skeleton, connect to `movies_db` | A | High | 2h | To Do |
-| 3 | Inventory API: `GET/POST/DELETE /api/movies` | A | High | 3h | To Do |
-| 4 | Inventory API: `GET/PUT/DELETE /api/movies/<id>` | A | High | 2h | To Do |
-| 5 | Inventory API: Postman tests + export collection | A | Med | 1.5h | To Do |
-| 6 | Billing API: RabbitMQ consumer (`pika`) skeleton on `billing_queue` | A | High | 2h | To Do |
-| 7 | Billing API: parse message → insert into `billing_db.orders` → ack | A | High | 2h | To Do |
-| 8 | Billing API: process pending messages on startup (resilience test) | A | High | 1.5h | To Do |
-| 9 | Billing API: test steps doc (publish/stop/restart scenarios) | A | Med | 1h | To Do |
-| 10 | API Gateway: skeleton Flask app | B | High | 1h | To Do |
-| 11 | API Gateway: proxy `/api/movies` → Inventory API (HTTP) | B | High | 2h | To Do |
-| 12 | API Gateway: `POST /api/billing` → publish to `billing_queue` | B | High | 2h | To Do |
-| 13 | API Gateway: OpenAPI/SwaggerHub documentation | B | Med | 2h | To Do |
-| 14 | `Vagrantfile`: define 3 VMs (gateway/inventory/billing) | B | High | 2h | To Do |
-| 15 | `scripts/`: install Python, Postgres, RabbitMQ, PM2 per VM | B | High | 3h | To Do |
-| 16 | `scripts/`: DB init (create `movies_db`, `billing_db`, tables) | B | High | 1.5h | To Do |
-| 17 | Wire `.env` vars through Vagrant into services | B | High | 1.5h | To Do |
-| 18 | PM2 config for each app (start/stop/list/restart) | B | Med | 1h | To Do |
-| 19 | README.md: architecture, stack, setup/run/test, env vars | B | High | 2h | To Do |
-| 20 | Integration test: Gateway ↔ Inventory (local, pre-VM) | Both | High | 1h | To Do |
-| 21 | Integration test: Gateway ↔ RabbitMQ ↔ Billing (local, pre-VM) | Both | High | 1h | To Do |
-| 22 | Full VM test: `vagrant up/status/ssh`, PM2 resilience test on billing-app | Both | High | 2h | To Do |
+| 1 | Set up repo structure, `.gitignore`, `.env` skeleton | Both | High | 1h | Done |
+| 2 | Inventory API: Flask + SQLAlchemy skeleton, connect to `movies_db` | A | High | 2h | Done |
+| 3 | Inventory API: `GET/POST/DELETE /api/movies` | A | High | 3h | Done |
+| 4 | Inventory API: `GET/PUT/DELETE /api/movies/<id>` | A | High | 2h | Done |
+| 5 | Inventory API: Postman tests + export collection | A | Med | 1.5h | Done — `docs/postman_collection.json` |
+| 6 | Billing API: RabbitMQ consumer (`pika`) skeleton on `billing_queue` | A | High | 2h | Done |
+| 7 | Billing API: parse message → insert into `billing_db.orders` → ack | A | High | 2h | Done |
+| 8 | Billing API: process pending messages on startup (resilience test) | A | High | 1.5h | Done |
+| 9 | Billing API: test steps doc (publish/stop/restart scenarios) | A | Med | 1h | Done — `docs/billing-test-steps.md` |
+| 10 | API Gateway: skeleton Flask app | B | High | 1h | Done |
+| 11 | API Gateway: proxy `/api/movies` → Inventory API (HTTP) | B | High | 2h | Done |
+| 12 | API Gateway: `POST /api/billing` → publish to `billing_queue` | B | High | 2h | Done |
+| 13 | API Gateway: OpenAPI/SwaggerHub documentation | B | Med | 2h | Done — `docs/openapi.yaml` |
+| 14 | `Vagrantfile`: define 3 VMs (gateway/inventory/billing) | B | High | 2h | Done |
+| 15 | `scripts/`: install Python, Postgres, RabbitMQ, PM2 per VM | B | High | 3h | Done |
+| 16 | `scripts/`: DB init (create `movies_db`, `billing_db`, tables) | B | High | 1.5h | Done |
+| 17 | Wire `.env` vars through Vagrant into services | B | High | 1.5h | Done |
+| 18 | PM2 config for each app (start/stop/list/restart) | B | Med | 1h | Done — `ecosystem.config.js` + resurrect |
+| 19 | README.md: architecture, stack, setup/run/test, env vars | B | High | 2h | Done |
+| 20 | Integration test: Gateway ↔ Inventory (local, pre-VM) | Both | High | 1h | Done — `scripts/test_local.sh` |
+| 21 | Integration test: Gateway ↔ RabbitMQ ↔ Billing (local, pre-VM) | Both | High | 1h | Done — `scripts/test_local.sh` |
+| 22 | Full VM test: `vagrant up/status/ssh`, PM2 resilience test on billing-app | Both | High | 2h | Done — verified cross-VM + resilience |
 | 23 | Final review: README, Postman collection, OpenAPI doc | Both | Med | 1h | To Do |
 
 ## Sprint Plan

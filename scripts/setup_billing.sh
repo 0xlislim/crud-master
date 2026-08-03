@@ -25,6 +25,9 @@ if [ "${RABBITMQ_USER:-guest}" != "guest" ]; then
   sudo rabbitmqctl set_permissions -p / "${RABBITMQ_USER}" ".*" ".*" ".*"
 fi
 
+# --- Management UI (for manual publish/debug via http://<vm>:15672) ---
+sudo rabbitmq-plugins enable rabbitmq_management
+
 sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname = '${BILLING_DB_USER:-billing_user}'" | grep -q 1 || \
   sudo -u postgres psql -c "CREATE USER ${BILLING_DB_USER:-billing_user} WITH PASSWORD '${BILLING_DB_PASSWORD:-12qw!@QW}';"
 
@@ -34,15 +37,23 @@ sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '${BILLING_
 # --- Create orders table (idempotent, safe to re-run) ---
 sudo -u postgres psql -d "${BILLING_DB_NAME:-billing_db}" -f /vagrant/scripts/init_billing_db.sql
 
+# --- Grant the app user privileges on the table/sequences ---
+sudo -u postgres psql -d "${BILLING_DB_NAME:-billing_db}" -c \
+  "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${BILLING_DB_USER:-billing_user};
+   GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${BILLING_DB_USER:-billing_user};"
+
 # --- App setup ---
 APP_DIR="/vagrant/srcs/billing-app"
 cd "$APP_DIR"
+# The shared folder may carry a host-created venv with dangling symlinks;
+# recreate it with the VM's Python.
+rm -rf venv
 python3 -m venv venv
 ./venv/bin/pip install -r requirements.txt
 
 # --- Start with PM2 ---
 sudo pm2 delete billing-app 2>/dev/null || true
-sudo pm2 start "$APP_DIR/venv/bin/python" --name billing-app -- "$APP_DIR/server.py"
+sudo pm2 start "$APP_DIR/ecosystem.config.js"
 sudo pm2 save
 
 # --- Ensure PM2 resurrects this process list automatically on VM reboot ---

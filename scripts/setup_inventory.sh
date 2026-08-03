@@ -23,15 +23,28 @@ sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '${INVENTOR
 # --- Create movies table (idempotent, safe to re-run) ---
 sudo -u postgres psql -d "${INVENTORY_DB_NAME:-movies_db}" -f /vagrant/scripts/init_movies_db.sql
 
+# --- Grant the app user privileges on the table/sequences ---
+sudo -u postgres psql -d "${INVENTORY_DB_NAME:-movies_db}" -c \
+  "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${INVENTORY_DB_USER:-inventory_user};
+   GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${INVENTORY_DB_USER:-inventory_user};"
+
+# --- Cross-VM connectivity ---
+# Bind on 0.0.0.0 so gateway-vm can reach the API. Set via the PM2 ecosystem
+# config (env set by PM2 survives sudo; plain shell exports do not).
+# See srcs/inventory-app/ecosystem.config.js.
+
 # --- App setup ---
 APP_DIR="/vagrant/srcs/inventory-app"
 cd "$APP_DIR"
+# The shared folder may carry a host-created venv with dangling symlinks;
+# recreate it with the VM's Python.
+rm -rf venv
 python3 -m venv venv
 ./venv/bin/pip install -r requirements.txt
 
 # --- Start with PM2 ---
 sudo pm2 delete inventory-app 2>/dev/null || true
-sudo pm2 start "$APP_DIR/venv/bin/python" --name inventory-app -- "$APP_DIR/server.py"
+sudo pm2 start "$APP_DIR/ecosystem.config.js"
 sudo pm2 save
 
 # --- Ensure PM2 resurrects this process list automatically on VM reboot ---

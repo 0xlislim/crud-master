@@ -1,10 +1,19 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Requires the vagrant-dotenv plugin:
-#   vagrant plugin install vagrant-dotenv
-require 'dotenv'
-Dotenv.load('.env') if File.exist?('.env')
+# Load .env into ENV manually. The vagrant-dotenv plugin is incompatible with
+# the Ruby version bundled in recent Vagrant (File.exists? was removed in
+# Ruby 3.2), so we parse the file ourselves and pass it to the provision
+# scripts via env: ENV.to_h below.
+env_file = File.join(__dir__, ".env")
+if File.exist?(env_file)
+  File.readlines(env_file).each do |line|
+    line = line.strip
+    next if line.empty? || line.start_with?("#") || !line.include?("=")
+    key, value = line.split("=", 2)
+    ENV[key] ||= value
+  end
+end
 
 Vagrant.configure("2") do |config|
 

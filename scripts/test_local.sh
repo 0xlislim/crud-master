@@ -19,7 +19,7 @@ set -a
 source "$ROOT_DIR/.env"
 set +a
 
-GATEWAY_URL="${GATEWAY_URL:-http://localhost:${GATEWAY_PORT:-9000}}"
+GATEWAY_URL="${GATEWAY_URL:-http://192.168.56.10:9000}"
 
 PASS=0
 FAIL=0

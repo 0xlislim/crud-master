@@ -19,7 +19,7 @@ set -a
 source "$ROOT_DIR/.env"
 set +a
 
-GATEWAY_URL="${GATEWAY_URL:-http://192.168.56.10:9000}"
+GATEWAY_URL="http://192.168.56.10:9000"
 
 PASS=0
 FAIL=0
@@ -100,17 +100,20 @@ echo
 echo "=== 4. Billing consumer -> billing_db (needs the consumer running) ==="
 if command -v psql >/dev/null 2>&1; then
   rows="$(PGPASSWORD="${BILLING_DB_PASSWORD}" psql -h "${BILLING_DB_HOST}" -p "${BILLING_DB_PORT}" \
-      -U "${BILLING_DB_USER}" -d "${BILLING_DB_NAME}" -tAc 'SELECT count(*) FROM orders;')"
-  echo "INFO: orders rows now: ${rows} (expect >= 1 if the consumer processed the message)"
-  if [ "${rows:-0}" -ge 1 ] 2>/dev/null; then
-    PASS=$((PASS + 1))
-    echo "PASS: order persisted in billing_db.orders"
-  else
-    FAIL=$((FAIL + 1))
-    echo "FAIL: no rows found in billing_db.orders (is the Billing consumer running?)"
-  fi
+      -U "${BILLING_DB_USER}" -d "${BILLING_DB_NAME}" -tAc 'SELECT count(*) FROM orders;' | tr -d '[:space:]')"
+elif command -v vagrant >/dev/null 2>&1; then
+  rows="$(vagrant ssh billing-vm -c "PGPASSWORD='${BILLING_DB_PASSWORD}' psql -h localhost -p ${BILLING_DB_PORT} -U ${BILLING_DB_USER} -d ${BILLING_DB_NAME} -tAc 'SELECT count(*) FROM orders;'" 2>/dev/null | tr -d '[:space:]')"
 else
-  echo "SKIP: psql not available locally; check orders manually (see docs/billing-test-steps.md)"
+  echo "SKIP: psql and vagrant not available; check orders manually (see docs/billing-test-steps.md)"
+  rows="0"
+fi
+echo "INFO: orders rows now: ${rows} (expect >= 1 if the consumer processed the message)"
+if [ "${rows:-0}" -ge 1 ] 2>/dev/null; then
+  PASS=$((PASS + 1))
+  echo "PASS: order persisted in billing_db.orders"
+else
+  FAIL=$((FAIL + 1))
+  echo "FAIL: no rows found in billing_db.orders (is the Billing consumer running?)"
 fi
 
 echo

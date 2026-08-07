@@ -14,8 +14,8 @@ def start_consumer():
     # Load environment configuration
     host = os.getenv("RABBITMQ_HOST", "localhost")
     port = int(os.getenv("RABBITMQ_PORT", 5672))
-    user = os.getenv("RABBITMQ_USER", "guest")
-    password = os.getenv("RABBITMQ_PASSWORD", "guest")
+    user = os.getenv("RABBITMQ_USER", "")
+    password = os.getenv("RABBITMQ_PASSWORD", "")
     queue = os.getenv("RABBITMQ_QUEUE", "billing_queue")
     
     # Initialize DB connection with retries (in case the database takes time to boot)

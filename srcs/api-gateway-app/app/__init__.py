@@ -13,8 +13,8 @@ def create_app():
     app.config["INVENTORY_API_PORT"] = os.getenv("INVENTORY_API_PORT", "8080")
     app.config["RABBITMQ_HOST"] = os.getenv("RABBITMQ_HOST", "localhost")
     app.config["RABBITMQ_PORT"] = os.getenv("RABBITMQ_PORT", "5672")
-    app.config["RABBITMQ_USER"] = os.getenv("RABBITMQ_USER", "guest")
-    app.config["RABBITMQ_PASSWORD"] = os.getenv("RABBITMQ_PASSWORD", "guest")
+    app.config["RABBITMQ_USER"] = os.getenv("RABBITMQ_USER", "")
+    app.config["RABBITMQ_PASSWORD"] = os.getenv("RABBITMQ_PASSWORD", "")
     app.config["RABBITMQ_QUEUE"] = os.getenv("RABBITMQ_QUEUE", "billing_queue")
 
     from app.routes import bp as routes_bp

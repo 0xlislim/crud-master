@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "e4fa8983-f24c-4eab-9207-9c55ebd329f7",
     "name": "CRUD Master — API Gateway",
-    "description": "Tests for the CRUD Master platform through the API Gateway.\n\nInventory endpoints are proxied to the Inventory API over HTTP. The billing\nendpoint publishes a message to the RabbitMQ billing_queue for asynchronous\nprocessing by the Billing API.\n\nBase URL: {{baseUrl}} (default http://localhost:9000).\n\nNote: run requests in order (Create -> Get -> Update -> Delete) so that the\n`movieId` collection variable is set by the Create request.",
+    "description": "Tests for the CRUD Master platform through the API Gateway.\n\nInventory endpoints are proxied to the Inventory API over HTTP. The billing\nendpoint publishes a message to the RabbitMQ billing_queue for asynchronous\nprocessing by the Billing API.\n\nBase URL: {{baseUrl}} (default http://192.168.56.10:9000 — the gateway-vm private IP).\n\nNote: run requests in order (Create -> Get -> Update -> Delete) so that the\n`movieId` collection variable is set by the Create request.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -351,7 +351,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:9000"
+      "value": "http://192.168.56.10:9000"
     },
     {
       "key": "movieId",

@@ -163,7 +163,9 @@ vagrant ssh gateway-vm -- curl -s -X POST http://localhost:9000/api/billing \
 ## Testing
 
 - **Postman** — import `docs/postman_collection.json` (requests target the
-  gateway at `http://localhost:9000`). Contains tests for every Inventory
+  gateway at `http://192.168.56.10:9000`, the gateway-vm private IP; the
+  `baseUrl` collection variable can be overridden). Contains tests for every
+  Inventory
   endpoint (list, search, create, get-by-id, update, delete-by-id, delete-all)
   and `POST /api/billing`.
 - **OpenAPI** — `docs/openapi.yaml` documents the API Gateway endpoints.
